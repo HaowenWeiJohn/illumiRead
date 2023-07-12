@@ -23,3 +23,7 @@ class RealtimeFxiationDetectionIVT(DataProcessor):
 
 
 
+class RealtimeFxiationDetectionIDT(DataProcessor):
+
+    def __init__(self):
+        super().__init__(data_processor_type=DataProcessorType.CustomDataProcessor)

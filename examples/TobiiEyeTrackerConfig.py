@@ -55,7 +55,12 @@
 
 from enum import Enum
 
-class TobiiProFusionChannel(Enum):
+class IndexClass(int, Enum):
+    pass
+
+
+
+class TobiiProFusionChannel(IndexClass):
     CombinedGazeRayScreenDirectionX = 0
     CombinedGazeRayScreenDirectionY = 1
     CombinedGazeRayScreenDirectionZ = 2
@@ -107,3 +112,7 @@ class TobiiProFusionChannel(Enum):
     RightPupilDiameterValid = 48
     OriginalGazeDeviceTimeStamp = 49
     OriginalGazeSystemTimeStamp = 50
+
+
+    def __int__(self) -> int:
+        return int.__int__(self)
