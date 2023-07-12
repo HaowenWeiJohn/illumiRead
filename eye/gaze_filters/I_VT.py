@@ -25,5 +25,5 @@ class RealtimeFxiationDetectionIVT(DataProcessor):
 
 class RealtimeFxiationDetectionIDT(DataProcessor):
 
-    def __init__(self):
+    def __init__(self, sampling_frequency, time_unit_scale_factor, max_gap_length, angular_velocity_degree_limit):
         super().__init__(data_processor_type=DataProcessorType.CustomDataProcessor)

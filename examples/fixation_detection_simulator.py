@@ -84,6 +84,9 @@ for index, timestamp in enumerate(timestamps):
                                                                        combined_gaze_vector_normalized,
                                                                        sampling_frequency)
 
+
+
+
     # calculate angular velocity between two gaze vectors
 
 
