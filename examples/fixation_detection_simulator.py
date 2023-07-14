@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from examples.TobiiEyeTrackerConfig import TobiiProFusionChannel
 from utils.general_utils import angle_between_vectors, angular_velocity_between_vectors_radians, \
-    angular_velocity_between_vectors_degrees, init_fifo_buffer, calculate_angular_dispersion
+    angular_velocity_between_vectors_degrees, init_fifo_buffer_with_duration_sampling_rate, calculate_angular_dispersion
 
 file_path = 'TobiiGazeData.pickle'
 # Open the file in binary mode
@@ -46,9 +46,9 @@ gap_fill_check_buffer_size = sampling_frequency * (
 angular_velocity_limit_degree = 1000  # degree per second
 
 buffer_duration = 150  # millisecond
-gaze_vector_buffer = init_fifo_buffer(duration=buffer_duration, sampling_frequency=sampling_frequency, channel_number=3,
-                                      sampling_frequency_duration_unit_scaling_factor=1000,
-                                      fill_value=0, dtype=np.float64)
+gaze_vector_buffer = init_fifo_buffer_with_duration_sampling_rate(duration=buffer_duration, sampling_frequency=sampling_frequency, channel_number=3,
+                                                                  sampling_frequency_duration_unit_scaling_factor=1000,
+                                                                  fill_value=0, dtype=np.float64)
 
 last_timestamp = 0
 last_combined_gaze_vector_normalized = np.array([0, 0, 1])
