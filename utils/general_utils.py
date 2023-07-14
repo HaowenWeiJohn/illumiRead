@@ -59,7 +59,9 @@ class CircularBufferFIFO:
     def __init__(self, buffer_size, frame_size, fill_value=0, dtype=np.float64):
         self.buffer_size = buffer_size
         self.frame_size = frame_size
-        self.buffer = np.full((buffer_size, frame_size), fill_value=fill_value, dtype=dtype)
+        self.fill_value = fill_value
+        self.dtype = dtype
+        self.buffer = np.full((buffer_size, frame_size), fill_value=fill_value, dtype=self.dtype)
         self.head = 0
 
     def push(self, new_frame):
@@ -97,6 +99,10 @@ class CircularBufferFIFO:
 
     def is_empty(self):
         return self.head == 0
+
+    def reset_buffer(self):
+        self.buffer = np.full((self.buffer_size, self.frame_size), fill_value=self.fill_value, dtype=self.dtype)
+        self.head = 0
 
 
 def init_fifo_buffer(duration, sampling_frequency, channel_number, sampling_frequency_duration_unit_scaling_factor=1,

@@ -41,18 +41,17 @@ sampling_frequency = 250
 # while there are still point
 sampling_frequency_duration_unit_scaling_factor = 1000  # millisecond
 max_gap_length = 75  # millisecond
-gap_fill_check_buffer_size = sampling_frequency*(max_gap_length/sampling_frequency_duration_unit_scaling_factor)  # 75 ms
+gap_fill_check_buffer_size = sampling_frequency * (
+            max_gap_length / sampling_frequency_duration_unit_scaling_factor)  # 75 ms
 angular_velocity_limit_degree = 1000  # degree per second
 
 buffer_duration = 150  # millisecond
-gaze_vector_buffer = init_fifo_buffer(duration=buffer_duration, sampling_frequency=sampling_frequency, channel_number=3, sampling_frequency_duration_unit_scaling_factor=1000,
-                       fill_value=0, dtype=np.float64)
+gaze_vector_buffer = init_fifo_buffer(duration=buffer_duration, sampling_frequency=sampling_frequency, channel_number=3,
+                                      sampling_frequency_duration_unit_scaling_factor=1000,
+                                      fill_value=0, dtype=np.float64)
 
 last_timestamp = 0
 last_combined_gaze_vector_normalized = np.array([0, 0, 1])
-
-
-
 
 for index, timestamp in enumerate(timestamps):
     gaze_data_t = gaze_data[:, index]
@@ -83,7 +82,7 @@ for index, timestamp in enumerate(timestamps):
 
     # combine left and right gaze vector to get the combined gaze vector
     combined_gaze_vector = left_gaze_vector_normalized + right_gaze_vector_normalized
-    combined_gaze_vector_normalized = combined_gaze_vector / np.linalg.norm(combined_gaze_vector) ## add to buffer
+    combined_gaze_vector_normalized = combined_gaze_vector / np.linalg.norm(combined_gaze_vector)  ## add to buffer
 
     gaze_vector_buffer.push(combined_gaze_vector_normalized)
     if gaze_vector_buffer.is_full():
@@ -93,27 +92,11 @@ for index, timestamp in enumerate(timestamps):
                                                                 combined_gaze_vector_normalized,
                                                                 sampling_frequency)
 
-
-
-
     gaze_vector_buffer.push(combined_gaze_vector_normalized)
-
-
-
-
-
-
-
-
 
     # if angular velocity is too large, skip
 
-
-
-
     # calculate angular velocity between two gaze vectors
-
-
 
     # print(combined_gaze_vector_normalized)
     #
