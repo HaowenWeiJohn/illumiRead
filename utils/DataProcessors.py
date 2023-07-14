@@ -1,8 +1,8 @@
 import numpy as np
-from scipy.signal import butter, freqz, iirnotch, filtfilt
+from scipy.signal import butter, iirnotch
 from enum import Enum
 
-from utils.exceptions import DataProcessorEvokeFailedError
+from exceptions import DataProcessorEvokeFailedError
 
 
 class DataProcessorType(Enum):

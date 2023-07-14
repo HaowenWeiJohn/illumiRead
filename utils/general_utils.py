@@ -76,21 +76,27 @@ class CircularBufferFIFO:
         if self.head > 0:
             self.head -= 1
             self.buffer = np.roll(self.buffer, -1, axis=0)
+            return self.buffer[-1]
 
     def last(self):
-        return self.buffer[self.head]
+        if not self.is_empty():
+            return self.buffer[self.head-1]
 
     def first(self):
-        return self.buffer[0]
+        if not self.is_empty():
+            return self.buffer[0]
 
-    def __getitem__(self, item):
-        return self.buffer[item]
+    def __getitem__(self, index):
+        return self.buffer[index]
 
     def get_all(self):
         return self.buffer[:self.head]
 
     def is_full(self):
         return self.head == self.buffer_size
+
+    def is_empty(self):
+        return self.head == 0
 
 
 def init_fifo_buffer(duration, sampling_frequency, channel_number, sampling_frequency_duration_unit_scaling_factor=1,
