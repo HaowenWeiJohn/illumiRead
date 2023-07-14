@@ -1,7 +1,4 @@
-
-
-
-
+import numpy as np
 
 class illumiReadError(Exception):
     def __init__(self, message=""):
