@@ -335,8 +335,9 @@ class DataProcessor:  # (QObject):
         self.data_processor_valid = False
         self.channel_num = 0
 
-    def process_sample(self, data):
-        return data
+    def process_sample(self, **kwargs):
+        pass
+        # return data
 
     def process_sample_timestamp(self, data, timestamp):
         return data, timestamp

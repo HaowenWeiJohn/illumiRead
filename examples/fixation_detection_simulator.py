@@ -39,15 +39,15 @@ plt.show()
 
 sampling_frequency = 250
 # while there are still point
-sampling_frequency_duration_unit_scaling_factor = 1000  # millisecond
+sampling_frequency_unit_duration_unit_scaling_factor = 1000  # millisecond
 max_gap_length = 75  # millisecond
 gap_fill_check_buffer_size = sampling_frequency * (
-            max_gap_length / sampling_frequency_duration_unit_scaling_factor)  # 75 ms
+            max_gap_length / sampling_frequency_unit_duration_unit_scaling_factor)  # 75 ms
 angular_velocity_limit_degree = 1000  # degree per second
 
 buffer_duration = 150  # millisecond
 gaze_vector_buffer = init_fifo_buffer_with_duration_sampling_rate(duration=buffer_duration, sampling_frequency=sampling_frequency, channel_number=3,
-                                                                  sampling_frequency_duration_unit_scaling_factor=1000,
+                                                                  sampling_frequency_unit_duration_unit_scaling_factor=sampling_frequency_unit_duration_unit_scaling_factor,
                                                                   fill_value=0, dtype=np.float64)
 
 last_timestamp = 0

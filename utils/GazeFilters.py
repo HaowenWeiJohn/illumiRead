@@ -1,52 +1,54 @@
 from utils.DataProcessors import *
-from utils.general_utils import init_fifo_buffer_with_duration_sampling_rate, calculate_angular_dispersion, \
-    TimeSensitiveCircularBufferFIFO
+from utils.general_utils import init_fifo_buffer_with_duration_sampling_rate, calculate_angular_dispersion
 
 
 class GapFilling(DataProcessor):
     def __init__(self,
+                 sampling_frequency=250,
                  max_gap_duration=75,
-                 duration_unit_to_second_scaling=1000,
+                 sampling_frequency_unit_duration_unit_scaling_factor=1000,
                  missing_data_flag=0,
                  dtype=np.float64):
         super().__init__()
+        self.sampling_frequency = sampling_frequency,
         self.max_gap_duration = max_gap_duration
-        self.duration_unit_to_second_scaling = duration_unit_to_second_scaling
+        self.sampling_frequency_unit_duration_unit_scaling_factor = sampling_frequency_unit_duration_unit_scaling_factor
         self.missing_data_flag = missing_data_flag
         self.dtype = dtype
 
-        self._gap_buffer = None
+        self._data_buffer = None
+        self._valid_buffer = None
 
-    def process_sample_timestamp(self, data, timestamp): # data -1 means missing data
-        self._gap_buffer.push(data, timestamp)
-        missing_data_flag_indices = self._gap_buffer.index(self.missing_data_flag)
-        # TODO: implement the gap filling algorithm
+    def process_sample(self, data, valid):  # data -1 means missing data
 
-
-
-
-
-
-
-        # 1. find the place with missing data
-
-        # 2. check position of missing data
-
+        return data, valid
 
     def evoke_function(self):
-        self._gap_buffer = TimeSensitiveCircularBufferFIFO(duration=self.max_gap_duration,
-                                                           duration_unit_to_second_scaling=self.duration_unit_to_second_scaling,
-                                                           dtype=np.float64)
+        self._data_buffer = init_fifo_buffer_with_duration_sampling_rate(duration=self.max_gap_duration,
+                                                                         sampling_frequency=self.sampling_frequency,
+                                                                         channel_number=self.channel_num,
+                                                                         sampling_frequency_unit_duration_unit_scaling_factor=self.sampling_frequency_unit_duration_unit_scaling_factor,
+                                                                         dtype=self.dtype)
 
-    def set_data_processor_params(self, max_gap_duration=75,
+        self._valid_buffer = init_fifo_buffer_with_duration_sampling_rate(duration=self.max_gap_duration,
+                                                                          sampling_frequency=self.sampling_frequency,
+                                                                          channel_number=1,
+                                                                          sampling_frequency_unit_duration_unit_scaling_factor=self.sampling_frequency_unit_duration_unit_scaling_factor,
+                                                                          dtype=self.dtype)
+
+    def set_data_processor_params(self,
+                                  sampling_frequency=250,
+                                  max_gap_duration=75,
                                   duration_unit_to_second_scaling=1000,
                                   dtype=np.float64):
+
+        self.sampling_frequency = sampling_frequency
         self.max_gap_duration = max_gap_duration
         self.duration_unit_to_second_scaling = duration_unit_to_second_scaling
         self.dtype = dtype
 
     def reset_data_processor(self):
-        self._gap_buffer.reset_buffer()
+        pass
 
 
 class GazeFilterFixationDetectionIDTAngular(DataProcessor):
@@ -68,7 +70,6 @@ class GazeFilterFixationDetectionIDTAngular(DataProcessor):
         self._gaze_vector_buffer = init_fifo_buffer_with_duration_sampling_rate(duration=self.duration,
                                                                                 sampling_frequency=self.sampling_frequency,
                                                                                 channel_number=self.channel_num,
-                                                                                # x, y, z
                                                                                 sampling_frequency_duration_unit_scaling_factor=self.sampling_frequency_duration_unit_scaling_factor,
                                                                                 dtype=self.dtype)
 
@@ -82,7 +83,7 @@ class GazeFilterFixationDetectionIDTAngular(DataProcessor):
         self.angular_threshold_degree = angular_threshold_degree
         self.dtype = dtype
 
-    def process_sample(self, gaze_vector):
+    def process_sample(self, gaze_vector, valid, timestamp):
         self._gaze_vector_buffer.push(gaze_vector)
         if self._gaze_vector_buffer.is_full():
             dispersion = calculate_angular_dispersion(self._gaze_vector_buffer.buffer)
