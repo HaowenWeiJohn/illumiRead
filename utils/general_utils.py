@@ -69,7 +69,7 @@ class CircularBufferFIFO:
         self.buffer = np.roll(self.buffer, 1, axis=0)
         # Update the first column with the new frame
         self.buffer[0] = new_frame
-
+        # print(f"{a = } when {b = }")
         if self.head < self.buffer_size:
             self.head += 1
 
@@ -104,35 +104,48 @@ class CircularBufferFIFO:
         self.buffer = np.full((self.buffer_size, self.frame_size), fill_value=self.fill_value, dtype=self.dtype)
         self.head = 0
 
-class TimeSensitiveCircularBufferFIFO(duration=100, duration_unit_second_scaling=1000, dtype=np.float64): # duration in milliseconds by default
+class TimeSensitiveCircularBufferFIFO: # duration in milliseconds by default
     """Returns a time sensitive circular buffer FIFO"""
-    def __init__(self, duration, duration_unit_second_scaling=1000, dtype=np.float64):
+    def __init__(self, duration, duration_unit_to_second_scaling=1000, dtype=np.float64):
         self.duration = duration
-        self.duration_unit_second_scaling = duration_unit_second_scaling
+        self.duration_unit_to_second_scaling = duration_unit_to_second_scaling
         self.dtype = dtype
 
-        self.duration_in_second = self.duration / self.duration_unit_second_scaling
+        self.duration_in_second = self.duration / self.duration_unit_to_second_scaling
         self.data_buffer = deque()
         self.timestamp_buffer = deque()
 
     def push(self, data, timestamp):
         self.data_buffer.appendleft(data)
         self.timestamp_buffer.appendleft(timestamp)
-        if self.is_full():
-            self.timestamp_buffer.popleft()
-            self.data_buffer.popleft()
+
+
+        # recursively pop the oldest data until the buffer is not full
+        while self.is_full():
+            self.timestamp_buffer.pop()
+            self.data_buffer.pop()
+
 
     def pop(self):
         if not self.is_empty():
-            return self.data_buffer.popleft(), self.timestamp_buffer.popleft()
+            return self.data_buffer.pop(), self.timestamp_buffer.pop()
         else:
             return None, None
     def is_full(self):
         return self.timestamp_buffer[-1] - self.timestamp_buffer[0] > self.duration_in_second
 
+    def first(self):
+        return self.data_buffer[0], self.timestamp_buffer[0]
+
+    def last(self):
+        return self.data_buffer[-1], self.timestamp_buffer[-1]
+
     def is_empty(self):
         return len(self.data_buffer) == 0
 
+    def reset_buffer(self):
+        self.data_buffer = deque()
+        self.timestamp_buffer = deque()
 
 
 

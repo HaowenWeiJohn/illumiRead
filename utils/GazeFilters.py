@@ -1,29 +1,52 @@
 from utils.DataProcessors import *
-from utils.general_utils import init_fifo_buffer_with_duration_sampling_rate, calculate_angular_dispersion
+from utils.general_utils import init_fifo_buffer_with_duration_sampling_rate, calculate_angular_dispersion, \
+    TimeSensitiveCircularBufferFIFO
 
 
 class GapFilling(DataProcessor):
     def __init__(self,
-                 sampling_frequency=250,
                  max_gap_duration=75,
-                 sampling_frequency_duration_unit_scaling_factor=1000,
+                 duration_unit_to_second_scaling=1000,
+                 missing_data_flag=0,
                  dtype=np.float64):
-
         super().__init__()
-        self.sampling_frequency = sampling_frequency
         self.max_gap_duration = max_gap_duration
-        self.sampling_frequency_duration_unit_scaling_factor = sampling_frequency_duration_unit_scaling_factor
+        self.duration_unit_to_second_scaling = duration_unit_to_second_scaling
+        self.missing_data_flag = missing_data_flag
         self.dtype = dtype
 
-        self.last_gaze_vector = None # x, y, z
-        self.last_timestamp = None
+        self._gap_buffer = None
+
+    def process_sample_timestamp(self, data, timestamp): # data -1 means missing data
+        self._gap_buffer.push(data, timestamp)
+        missing_data_flag_indices = self._gap_buffer.index(self.missing_data_flag)
+        # TODO: implement the gap filling algorithm
+
+
+
+
+
+
+
+        # 1. find the place with missing data
+
+        # 2. check position of missing data
+
 
     def evoke_function(self):
-        self.last_gaze_vector = np.zeros(self.channel_num, dtype=self.dtype)
-        self.last_timestamp = 0
+        self._gap_buffer = TimeSensitiveCircularBufferFIFO(duration=self.max_gap_duration,
+                                                           duration_unit_to_second_scaling=self.duration_unit_to_second_scaling,
+                                                           dtype=np.float64)
 
+    def set_data_processor_params(self, max_gap_duration=75,
+                                  duration_unit_to_second_scaling=1000,
+                                  dtype=np.float64):
+        self.max_gap_duration = max_gap_duration
+        self.duration_unit_to_second_scaling = duration_unit_to_second_scaling
+        self.dtype = dtype
 
-
+    def reset_data_processor(self):
+        self._gap_buffer.reset_buffer()
 
 
 class GazeFilterFixationDetectionIDTAngular(DataProcessor):
@@ -44,10 +67,10 @@ class GazeFilterFixationDetectionIDTAngular(DataProcessor):
     def evoke_function(self):
         self._gaze_vector_buffer = init_fifo_buffer_with_duration_sampling_rate(duration=self.duration,
                                                                                 sampling_frequency=self.sampling_frequency,
-                                                                                channel_number=self.channel_num,  # x, y, z
+                                                                                channel_number=self.channel_num,
+                                                                                # x, y, z
                                                                                 sampling_frequency_duration_unit_scaling_factor=self.sampling_frequency_duration_unit_scaling_factor,
                                                                                 dtype=self.dtype)
-
 
     def set_data_processor_params(self, sampling_frequency=250, duration=150,
                                   sampling_frequency_duration_unit_scaling_factor=1000,
@@ -69,3 +92,7 @@ class GazeFilterFixationDetectionIDTAngular(DataProcessor):
 
     def reset_data_processor(self):
         self._gaze_vector_buffer.reset_buffer()
+
+
+if __name__ == '__main__':
+    a = GapFilling()

@@ -338,6 +338,9 @@ class DataProcessor:  # (QObject):
     def process_sample(self, data):
         return data
 
+    def process_sample_timestamp(self, data, timestamp):
+        return data, timestamp
+
     def process_buffer(self, data):
         if self.data_processor_valid and self.data_processor_activated:
             output_buffer = np.empty(shape=data.shape)
