@@ -104,9 +104,40 @@ class CircularBufferFIFO:
         self.buffer = np.full((self.buffer_size, self.frame_size), fill_value=self.fill_value, dtype=self.dtype)
         self.head = 0
 
+class TimeSensitiveCircularBufferFIFO(duration=100, duration_unit_second_scaling=1000, dtype=np.float64): # duration in milliseconds by default
+    """Returns a time sensitive circular buffer FIFO"""
+    def __init__(self, duration, duration_unit_second_scaling=1000, dtype=np.float64):
+        self.duration = duration
+        self.duration_unit_second_scaling = duration_unit_second_scaling
+        self.dtype = dtype
 
-def init_fifo_buffer(duration, sampling_frequency, channel_number, sampling_frequency_duration_unit_scaling_factor=1,
-                     fill_value=0, dtype=np.float64) -> CircularBufferFIFO:
+        self.duration_in_second = self.duration / self.duration_unit_second_scaling
+        self.data_buffer = deque()
+        self.timestamp_buffer = deque()
+
+    def push(self, data, timestamp):
+        self.data_buffer.appendleft(data)
+        self.timestamp_buffer.appendleft(timestamp)
+        if self.is_full():
+            self.timestamp_buffer.popleft()
+            self.data_buffer.popleft()
+
+    def pop(self):
+        if not self.is_empty():
+            return self.data_buffer.popleft(), self.timestamp_buffer.popleft()
+        else:
+            return None, None
+    def is_full(self):
+        return self.timestamp_buffer[-1] - self.timestamp_buffer[0] > self.duration_in_second
+
+    def is_empty(self):
+        return len(self.data_buffer) == 0
+
+
+
+
+def init_fifo_buffer_with_duration_sampling_rate(duration, sampling_frequency, channel_number, sampling_frequency_duration_unit_scaling_factor=1,
+                                                 fill_value=0, dtype=np.float64) -> CircularBufferFIFO:
     """Returns a tap initialization array with the specified duration, sampling frequency, channel number and fill value"""
     buffer_size = sampling_frequency * (
                 duration / sampling_frequency_duration_unit_scaling_factor)  # int(duration * sampling_frequency * sampling_frequency_duration_unit_scaling_factor)

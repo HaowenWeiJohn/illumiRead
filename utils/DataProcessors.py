@@ -308,7 +308,7 @@ import numpy as np
 from scipy.signal import butter, freqz, iirnotch, filtfilt
 from enum import Enum
 
-from rena.exceptions.exceptions import UnsupportedErrorTypeError, DataProcessorEvokeFailedError, \
+from exceptions import DataProcessorEvokeFailedError, \
     DataProcessorInvalidBufferSizeError, DataProcessorInvalidFrequencyError, DaProcessorNotchFilterInvalidQError
 
 
