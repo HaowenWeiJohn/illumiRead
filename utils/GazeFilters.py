@@ -2,10 +2,10 @@ from utils.DataProcessors import *
 from utils.gaze_utils import GazeData
 from utils.general_utils import init_fifo_buffer_with_duration_sampling_rate, calculate_angular_dispersion, \
     edge_ignore_linear_interpolation
+from collections import deque
 
 
-
-class GapFilling(DataProcessor):
+class GazeDataGapFilling(DataProcessor):
 
     def __init__(self, sampling_frequency=250,
                  max_gap_duration=75,
@@ -15,13 +15,26 @@ class GapFilling(DataProcessor):
         self.sampling_frequency = sampling_frequency
         self.max_gap_duration = max_gap_duration
         self.sampling_frequency_unit_duration_unit_scaling_factor = sampling_frequency_unit_duration_unit_scaling_factor
+        self.duration_in_seconds = max_gap_duration / sampling_frequency_unit_duration_unit_scaling_factor
         self.missing_data_flag = missing_data_flag
 
+        self._gaze_data_buffer = deque()
+
+    def process_buffer(self, gaze_data: GazeData):
+        self._gaze_data_buffer.appendleft(gaze_data)
 
 
-    def process_buffer(self, data: GazeData):
+    def return_overflow_gaze_data(self):
+        gaze_data_list = []
+        while len(self._gaze_data_buffer) > 0:
 
-        pass
+            pass
+            # gaze_data_list.append(self._gaze_data_buffer.pop())
+
+
+        # check if the last gaze data is overflow
+
+
 
 
 # class GapFilling(DataProcessor):
