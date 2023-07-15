@@ -93,6 +93,8 @@ for index, timestamp in enumerate(timestamps):
     right_eye_on_display_area_x = gaze_data_t[TobiiProFusionChannel.RightGazePointOnDisplayAreaX]
     right_eye_on_display_area_y = gaze_data_t[TobiiProFusionChannel.RightGazePointOnDisplayAreaY]
 
+
+
     if combined_gaze_point_valid:
 
         left_gaze_vector = left_eye_gaze_point - left_eye_gaze_origin
@@ -115,17 +117,11 @@ for index, timestamp in enumerate(timestamps):
         combined_on_display_area_x = 0
         combined_on_display_area_y = 0
 
-    gaze_input = combined_arr = np.append(combined_gaze_vector_normalized, [combined_on_display_area_x, combined_on_display_area_x])
+    combined_gaze_input = combined_arr = np.append(combined_gaze_vector_normalized, [combined_on_display_area_x, combined_on_display_area_x])
+    combined_gaze_output, combined_gaze_valid = gap_filling_filter.process_sample(combined_gaze_input, combined_gaze_point_valid)
 
 
-    result = gap_filling_filter.process_sample(gaze_input, combined_gaze_point_valid)
 
-
-    # print(result)
-    # print(index)
-    # if index == 13868:
-    #     print(result)
-    # print(result)
 
 
 

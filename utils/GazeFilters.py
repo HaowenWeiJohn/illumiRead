@@ -97,10 +97,12 @@ class GazeFilterFixationDetectionIDTAngular(DataProcessor):
                  sampling_frequency_unit_duration_unit_scaling_factor=1000,
                  angular_threshold_degree=1.5, dtype=np.float64):
         super().__init__()
+
         self.sampling_frequency = sampling_frequency
         self.duration = duration
         self.sampling_frequency_unit_duration_unit_scaling_factor = sampling_frequency_unit_duration_unit_scaling_factor
         self.angular_threshold_degree = angular_threshold_degree
+
         self.dtype = dtype
 
         self._gaze_vector_buffer = None
@@ -113,12 +115,12 @@ class GazeFilterFixationDetectionIDTAngular(DataProcessor):
                                                                                 dtype=self.dtype)
 
     def set_data_processor_params(self, sampling_frequency=250, duration=150,
-                                  sampling_frequency_duration_unit_scaling_factor=1000,
+                                  sampling_frequency_unit_duration_unit_scaling_factor=1000,
                                   angular_threshold_degree=1.5, dtype=np.float64):
 
         self.sampling_frequency = sampling_frequency
         self.duration = duration
-        self.sampling_frequency_duration_unit_scaling_factor = sampling_frequency_duration_unit_scaling_factor
+        self.sampling_frequency_unit_duration_unit_scaling_factor = sampling_frequency_unit_duration_unit_scaling_factor
         self.angular_threshold_degree = angular_threshold_degree
         self.dtype = dtype
 
