@@ -104,6 +104,7 @@ class CircularBufferFIFO:
         self.buffer = np.full((self.buffer_size, self.frame_size), fill_value=self.fill_value, dtype=self.dtype)
         self.head = 0
 
+
 # class TimeSensitiveCircularBufferFIFO:  # duration in milliseconds by default
 #     """Returns a time sensitive circular buffer FIFO"""
 #
@@ -162,7 +163,6 @@ class CircularBufferFIFO:
 #     def reset_buffer(self):
 #         self.data_buffer = deque()
 #         self.timestamp_buffer = deque()
-
 
 
 # class TimeSensitiveCircularBufferWithValidation:  # duration in milliseconds by default
@@ -238,13 +238,6 @@ class CircularBufferFIFO:
 #         self.timestamp_buffer = deque()
 
 
-
-
-
-
-
-
-
 def init_fifo_buffer_with_duration_sampling_rate(duration, sampling_frequency, channel_number,
                                                  sampling_frequency_unit_duration_unit_scaling_factor=1,
                                                  fill_value=0, dtype=np.float64) -> CircularBufferFIFO:
@@ -272,6 +265,20 @@ def angular_velocity_between_vectors_degrees(v1, v2, time_delta):
     """Returns the angular velocity in radians per second between vectors 'v1' and 'v2'"""
     angle = angle_between_vectors(v1, v2)
     return np.degrees(angle) / time_delta
+
+
+def edge_ignore_linear_interpolation(data, valid, invalid_flag=0, channel_number=3):
+    valid_indexes = np.where(valid != invalid_flag)[0]
+    valid[valid_indexes[0]:valid_indexes[-1] + 1] = 1  # set all valid to 1 in this range
+    edge_ignored_values = data[valid_indexes]
+
+    for channel in range(channel_number):
+
+        interpolated_values = np.interp(np.arange(valid_indexes[-1] - valid_indexes[0] + 1),
+                                        valid_indexes - valid_indexes[0], edge_ignored_values[:, channel])
+        data[:, channel][valid_indexes[0]:valid_indexes[-1] + 1] = interpolated_values
+
+    return data, valid
 
 
 # def calculate_dispersion(unit_vectors, axis=0):
