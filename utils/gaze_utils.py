@@ -1,5 +1,12 @@
+import enum
+
 import numpy as np
 
+
+class GazeType(enum.Enum):
+    Saccade = 1
+    Fixation = 2
+    Unknown = 0
 
 class EyeData:
     def __init__(self, gaze_origin_in_user_coordinate=np.array([0, 0, 0]),
@@ -35,8 +42,10 @@ class GazeData:
     def __init__(self, left_eye_data: EyeData, right_eye_data: EyeData):
         self.left_eye_data = left_eye_data
         self.right_eye_data = right_eye_data
-
         self.combined_eye_data = self.get_combined_eye_data()
+        self.timestamp = self.combined_eye_data.timestamp
+
+        self.gaze_type = GazeType.Unknown
 
     def get_combined_eye_data(self):
         return EyeData(
