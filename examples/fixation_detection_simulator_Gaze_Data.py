@@ -2,7 +2,7 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 from examples.TobiiEyeTrackerConfig import TobiiProFusionChannel
-from utils.GazeFilters import GapFilling
+from utils.gaze_utils import EyeData, GazeData
 from utils.general_utils import angle_between_vectors, angular_velocity_between_vectors_radians, \
     angular_velocity_between_vectors_degrees, init_fifo_buffer_with_duration_sampling_rate, calculate_angular_dispersion
 
@@ -48,13 +48,13 @@ angular_velocity_limit_degree = 1000  # degree per second
 
 buffer_duration = 150  # millisecond
 
-gap_filling_filter = GapFilling(sampling_frequency=sampling_frequency,
-                                max_gap_duration=max_gap_duration,
-                                sampling_frequency_unit_duration_unit_scaling_factor=sampling_frequency_unit_duration_unit_scaling_factor,
-                                missing_data_flag=0,
-                                dtype=np.float64)
-gap_filling_filter.set_channel_num(5)
-gap_filling_filter.evoke_data_processor()
+# gap_filling_filter = GapFilling(sampling_frequency=sampling_frequency,
+#                                 max_gap_duration=max_gap_duration,
+#                                 sampling_frequency_unit_duration_unit_scaling_factor=sampling_frequency_unit_duration_unit_scaling_factor,
+#                                 missing_data_flag=0,
+#                                 dtype=np.float64)
+# gap_filling_filter.set_channel_num(5)
+# gap_filling_filter.evoke_data_processor()
 
 # gaze_vector_buffer = init_fifo_buffer_with_duration_sampling_rate(duration=buffer_duration, sampling_frequency=sampling_frequency, channel_number=3,
 #                                                                   sampling_frequency_unit_duration_unit_scaling_factor=sampling_frequency_unit_duration_unit_scaling_factor,
@@ -66,95 +66,74 @@ last_combined_gaze_vector_normalized = np.array([0, 0, 1])
 for index, timestamp in enumerate(timestamps):
     gaze_data_t = gaze_data[:, index]
 
-    left_eye_gaze_point_valid = gaze_data_t[TobiiProFusionChannel.LeftGazePointValid]
-    right_eye_gaze_point_valid = gaze_data_t[TobiiProFusionChannel.RightGazePointValid]
+    # left_eye_gaze_point_valid = gaze_data_t[TobiiProFusionChannel.LeftGazePointValid]
+    # right_eye_gaze_point_valid = gaze_data_t[TobiiProFusionChannel.RightGazePointValid]
 
-    left_eye_gaze_origin = gaze_data_t[[TobiiProFusionChannel.LeftGazeOriginInUserCoordinatesX,
-                                        TobiiProFusionChannel.LeftGazeOriginInUserCoordinatesY,
-                                        TobiiProFusionChannel.LeftGazeOriginInUserCoordinatesZ]]
+    left_gaze_origin_in_user_coordinate = gaze_data_t[[TobiiProFusionChannel.LeftGazeOriginInUserCoordinatesX,
+                                                       TobiiProFusionChannel.LeftGazeOriginInUserCoordinatesY,
+                                                       TobiiProFusionChannel.LeftGazeOriginInUserCoordinatesZ]]
 
-    left_eye_gaze_point = gaze_data_t[[TobiiProFusionChannel.LeftGazePointInUserCoordinatesX,
-                                       TobiiProFusionChannel.LeftGazePointInUserCoordinatesY,
-                                       TobiiProFusionChannel.LeftGazePointInUserCoordinatesZ]]
+    left_gaze_point_in_user_coordinate = gaze_data_t[[TobiiProFusionChannel.LeftGazePointInUserCoordinatesX,
+                                                      TobiiProFusionChannel.LeftGazePointInUserCoordinatesY,
+                                                      TobiiProFusionChannel.LeftGazePointInUserCoordinatesZ]]
 
-    right_eye_gaze_origin = gaze_data_t[[TobiiProFusionChannel.RightGazeOriginInUserCoordinatesX,
-                                         TobiiProFusionChannel.RightGazeOriginInUserCoordinatesY,
-                                         TobiiProFusionChannel.RightGazeOriginInUserCoordinatesZ]]
+    left_gaze_origin_in_track_box_coordinate = gaze_data_t[
+        [TobiiProFusionChannel.LeftGazeOriginInTrackBoxCoordinatesX,
+         TobiiProFusionChannel.LeftGazeOriginInTrackBoxCoordinatesY,
+         TobiiProFusionChannel.LeftGazeOriginInTrackBoxCoordinatesZ]]
 
-    right_eye_gaze_point = gaze_data_t[[TobiiProFusionChannel.RightGazePointInUserCoordinatesX,
-                                        TobiiProFusionChannel.RightGazePointInUserCoordinatesY,
-                                        TobiiProFusionChannel.RightGazePointInUserCoordinatesZ]]
+    left_gaze_origin_valid = gaze_data_t[TobiiProFusionChannel.LeftGazeOriginValid]
+    left_gaze_point_valid = gaze_data_t[TobiiProFusionChannel.LeftGazePointValid]
 
-    combined_gaze_point_valid = gaze_data_t[TobiiProFusionChannel.CombinedGazeRayScreenOriginValid]
+    left_pupil_diameter = gaze_data_t[TobiiProFusionChannel.LeftPupilDiameter]
+    left_pupil_diameter_valid = gaze_data_t[TobiiProFusionChannel.LeftPupilDiameterValid]
 
-    left_eye_on_display_area_x = gaze_data_t[TobiiProFusionChannel.LeftGazePointOnDisplayAreaX]
-    left_eye_on_display_area_y = gaze_data_t[TobiiProFusionChannel.LeftGazePointOnDisplayAreaY]
+    left_gaze_point_on_display_area = gaze_data_t[
+        [TobiiProFusionChannel.LeftGazePointOnDisplayAreaX, TobiiProFusionChannel.LeftGazePointOnDisplayAreaY]]
 
-    right_eye_on_display_area_x = gaze_data_t[TobiiProFusionChannel.RightGazePointOnDisplayAreaX]
-    right_eye_on_display_area_y = gaze_data_t[TobiiProFusionChannel.RightGazePointOnDisplayAreaY]
+    left_eye_gaze_data = EyeData(gaze_origin_in_user_coordinate=left_gaze_origin_in_user_coordinate,
+                                 gaze_point_in_user_coordinate=left_gaze_point_in_user_coordinate,
+                                 gaze_origin_valid=left_gaze_origin_valid,
+                                 gaze_point_valid=left_gaze_point_valid,
+                                 gaze_origin_in_trackbox_coordinate=left_gaze_origin_in_track_box_coordinate,
+                                 pupil_diameter=left_pupil_diameter,
+                                 pupil_diameter_valid=left_pupil_diameter_valid,
+                                 gaze_point_on_display_area=left_gaze_point_on_display_area,
+                                 timestamp=timestamp)
 
+    right_gaze_origin_in_user_coordinate = gaze_data_t[[TobiiProFusionChannel.RightGazeOriginInUserCoordinatesX,
+                                                        TobiiProFusionChannel.RightGazeOriginInUserCoordinatesY,
+                                                        TobiiProFusionChannel.RightGazeOriginInUserCoordinatesZ]]
 
-    
+    right_gaze_point_in_user_coordinate = gaze_data_t[[TobiiProFusionChannel.RightGazePointInUserCoordinatesX,
+                                                       TobiiProFusionChannel.RightGazePointInUserCoordinatesY,
+                                                       TobiiProFusionChannel.RightGazePointInUserCoordinatesZ]]
 
+    right_gaze_origin_in_track_box_coordinate = gaze_data_t[
+        [TobiiProFusionChannel.RightGazeOriginInTrackBoxCoordinatesX,
+         TobiiProFusionChannel.RightGazeOriginInTrackBoxCoordinatesY,
+         TobiiProFusionChannel.RightGazeOriginInTrackBoxCoordinatesZ]]
 
+    right_gaze_origin_valid = gaze_data_t[TobiiProFusionChannel.RightGazeOriginValid]
+    right_gaze_point_valid = gaze_data_t[TobiiProFusionChannel.RightGazePointValid]
 
-    # if combined_gaze_point_valid:
-    #
-    #     left_gaze_vector = left_eye_gaze_point - left_eye_gaze_origin
-    #     right_gaze_vector = right_eye_gaze_point - right_eye_gaze_origin
-    #
-    #     left_gaze_vector_normalized = left_gaze_vector / np.linalg.norm(left_gaze_vector)
-    #     right_gaze_vector_normalized = right_gaze_vector / np.linalg.norm(right_gaze_vector)
-    #
-    #
-    #     # combine left and right gaze vector to get the combined gaze vector
-    #     combined_gaze_vector = left_gaze_vector_normalized + right_gaze_vector_normalized
-    #     combined_gaze_vector_normalized = combined_gaze_vector / np.linalg.norm(combined_gaze_vector)  ## add to buffer
-    #
-    #     combined_on_display_area_x = (left_eye_on_display_area_x + right_eye_on_display_area_x) / 2
-    #     combined_on_display_area_y = (left_eye_on_display_area_y + right_eye_on_display_area_y) / 2
-    #
-    #
-    # else:
-    #     combined_gaze_vector_normalized = np.array([0, 0, 0])
-    #     combined_on_display_area_x = 0
-    #     combined_on_display_area_y = 0
-    #
-    # combined_gaze_input = combined_arr = np.append(combined_gaze_vector_normalized, [combined_on_display_area_x, combined_on_display_area_x])
-    # combined_gaze_output, combined_gaze_valid = gap_filling_filter.process_sample(combined_gaze_input, combined_gaze_point_valid)
+    right_pupil_diameter = gaze_data_t[TobiiProFusionChannel.RightPupilDiameter]
+    right_pupil_diameter_valid = gaze_data_t[TobiiProFusionChannel.RightPupilDiameterValid]
 
+    right_gaze_point_on_display_area = gaze_data_t[
+        [TobiiProFusionChannel.RightGazePointOnDisplayAreaX, TobiiProFusionChannel.RightGazePointOnDisplayAreaY]]
 
+    right_eye_gaze_data = EyeData(gaze_origin_in_user_coordinate=right_gaze_origin_in_user_coordinate,
+                                  gaze_point_in_user_coordinate=right_gaze_point_in_user_coordinate,
+                                  gaze_origin_valid=right_gaze_origin_valid,
+                                  gaze_point_valid=right_gaze_point_valid,
+                                  gaze_origin_in_trackbox_coordinate=right_gaze_origin_in_track_box_coordinate,
+                                  pupil_diameter=right_pupil_diameter,
+                                  pupil_diameter_valid=right_pupil_diameter_valid,
+                                  gaze_point_on_display_area=right_gaze_point_on_display_area,
+                                  timestamp=timestamp)
 
-
-
-
-
-
-    # gaze_vector_buffer.push(combined_gaze_vector_normalized)
-    # if gaze_vector_buffer.is_full():
-    #     dispersion = calculate_angular_dispersion(gaze_vector_buffer.buffer)
-    #
-    # angular_velocity = angular_velocity_between_vectors_degrees(last_combined_gaze_vector_normalized,
-    #                                                             combined_gaze_vector_normalized,
-    #                                                             sampling_frequency)
-    #
-    # gaze_vector_buffer.push(combined_gaze_vector_normalized)
-
-    # if angular velocity is too large, skip
-
-    # calculate angular velocity between two gaze vectors
-
-    # print(combined_gaze_vector_normalized)
-    #
-    #
-    # # fixation detection algorithm
-    # # I-DT
-    # # 1. if the current point is invalid, skip
-    #
-
+    gaze_data_ta = GazeData(left_eye_gaze_data=left_eye_gaze_data, right_eye_gaze_data = right_eye_gaze_data)
+    # print('Processed')
     pass
 
-#
-# right_eye_gaze_point_valid = gaze_data[TobiiProFusionChannel.RightGazePointValid.value]
-# right_eye_on_display_area_x = gaze_data[TobiiProFusionChannel.RightGazePointOnDisplayAreaX.value]
-# right_eye_on_display_area_y = gaze_data[TobiiProFusionChannel.RightGazePointOnDisplayAreaY.value]
