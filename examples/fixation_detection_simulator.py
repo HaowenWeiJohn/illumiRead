@@ -2,7 +2,7 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 from examples.TobiiEyeTrackerConfig import TobiiProFusionChannel
-from utils.GazeFilters import GapFilling
+from utils.GazeFiltersArchive import GapFilling
 from utils.general_utils import angle_between_vectors, angular_velocity_between_vectors_radians, \
     angular_velocity_between_vectors_degrees, init_fifo_buffer_with_duration_sampling_rate, calculate_angular_dispersion
 

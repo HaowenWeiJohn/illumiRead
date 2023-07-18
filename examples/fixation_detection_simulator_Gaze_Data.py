@@ -2,6 +2,7 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 from examples.TobiiEyeTrackerConfig import TobiiProFusionChannel
+from utils.GazeFilter import GazeDataGapFilling
 from utils.gaze_utils import EyeData, GazeData
 from utils.general_utils import angle_between_vectors, angular_velocity_between_vectors_radians, \
     angular_velocity_between_vectors_degrees, init_fifo_buffer_with_duration_sampling_rate, calculate_angular_dispersion
@@ -48,20 +49,13 @@ angular_velocity_limit_degree = 1000  # degree per second
 
 buffer_duration = 150  # millisecond
 
-# gap_filling_filter = GapFilling(sampling_frequency=sampling_frequency,
-#                                 max_gap_duration=max_gap_duration,
-#                                 sampling_frequency_unit_duration_unit_scaling_factor=sampling_frequency_unit_duration_unit_scaling_factor,
-#                                 missing_data_flag=0,
-#                                 dtype=np.float64)
-# gap_filling_filter.set_channel_num(5)
-# gap_filling_filter.evoke_data_processor()
+# last_timestamp = 0
+# last_combined_gaze_vector_normalized = np.array([0, 0, 1])
 
-# gaze_vector_buffer = init_fifo_buffer_with_duration_sampling_rate(duration=buffer_duration, sampling_frequency=sampling_frequency, channel_number=3,
-#                                                                   sampling_frequency_unit_duration_unit_scaling_factor=sampling_frequency_unit_duration_unit_scaling_factor,
-#                                                                   fill_value=0, dtype=np.float64)
-
-last_timestamp = 0
-last_combined_gaze_vector_normalized = np.array([0, 0, 1])
+gap_filling_filter = GazeDataGapFilling(sampling_frequency=250,
+                                        max_gap_duration=75,
+                                        sampling_frequency_unit_duration_unit_scaling_factor=1000,
+                                        invalid_flag=0)
 
 for index, timestamp in enumerate(timestamps):
     gaze_data_t = gaze_data[:, index]
@@ -133,7 +127,6 @@ for index, timestamp in enumerate(timestamps):
                                   gaze_point_on_display_area=right_gaze_point_on_display_area,
                                   timestamp=timestamp)
 
-    gaze_data_ta = GazeData(left_eye_gaze_data=left_eye_gaze_data, right_eye_gaze_data = right_eye_gaze_data)
-    # print('Processed')
-    pass
+    gaze_data_t = GazeData(left_eye_gaze_data=left_eye_gaze_data, right_eye_gaze_data=right_eye_gaze_data)
 
+    gap_filling_filter.process_sample(gaze_data_t)

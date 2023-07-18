@@ -5,30 +5,30 @@ from utils.general_utils import init_fifo_buffer_with_duration_sampling_rate, ca
 from collections import deque
 
 
-class GazeDataGapFilling(DataProcessor):
-
-    def __init__(self, sampling_frequency=250,
-                 max_gap_duration=75,
-                 sampling_frequency_unit_duration_unit_scaling_factor=1000,
-                 missing_data_flag=0):
-        super().__init__()
-        self.sampling_frequency = sampling_frequency
-        self.max_gap_duration = max_gap_duration
-        self.sampling_frequency_unit_duration_unit_scaling_factor = sampling_frequency_unit_duration_unit_scaling_factor
-        self.duration_in_seconds = max_gap_duration / sampling_frequency_unit_duration_unit_scaling_factor
-        self.missing_data_flag = missing_data_flag
-
-        self._gaze_data_buffer = deque()
-
-    def process_buffer(self, gaze_data: GazeData):
-        self._gaze_data_buffer.appendleft(gaze_data)
-
-
-    def return_overflow_gaze_data(self):
-        gaze_data_list = []
-        while len(self._gaze_data_buffer) > 0:
-
-            pass
+# class GazeDataGapFilling(DataProcessor):
+#
+#     def __init__(self, sampling_frequency=250,
+#                  max_gap_duration=75,
+#                  sampling_frequency_unit_duration_unit_scaling_factor=1000,
+#                  missing_data_flag=0):
+#         super().__init__()
+#         self.sampling_frequency = sampling_frequency
+#         self.max_gap_duration = max_gap_duration
+#         self.sampling_frequency_unit_duration_unit_scaling_factor = sampling_frequency_unit_duration_unit_scaling_factor
+#         self.duration_in_seconds = max_gap_duration / sampling_frequency_unit_duration_unit_scaling_factor
+#         self.missing_data_flag = missing_data_flag
+#
+#         self._gaze_data_buffer = deque()
+#
+#     def process_buffer(self, gaze_data: GazeData):
+#         self._gaze_data_buffer.appendleft(gaze_data)
+#
+#
+#     def return_overflow_gaze_data(self):
+#         gaze_data_list = []
+#         while len(self._gaze_data_buffer) > 0:
+#
+#             pass
             # gaze_data_list.append(self._gaze_data_buffer.pop())
 
 
