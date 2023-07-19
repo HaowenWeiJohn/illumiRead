@@ -1,7 +1,7 @@
 from utils.DataProcessors import *
 from utils.gaze_utils import GazeData, GazeType
 from utils.general_utils import init_fifo_buffer_with_duration_sampling_rate, calculate_angular_dispersion, \
-    edge_ignore_linear_interpolation
+    edge_ignore_linear_interpolation, angular_velocity_between_vectors_degrees
 from collections import deque
 
 
@@ -122,3 +122,30 @@ class GazeFilterFixationDetectionIDTAngular(DataProcessor):
             gaze_data.gaze_type = GazeType.UNDETERMINED
 
         return gaze_data
+
+
+class GazeFilterFixationDetectionIVT(DataProcessor):
+    def __init__(self, angular_threshold_degree=100):
+        super().__init__()
+        self.last_gaze_data = GazeData()
+        self.angular_threshold_degree = angular_threshold_degree
+
+
+    def process_sample(self, gaze_data: GazeData):
+        if self.last_gaze_data.combined_eye_gaze_data.gaze_point_valid:
+
+            speed = angular_velocity_between_vectors_degrees(
+                self.last_gaze_data.combined_eye_gaze_data.gaze_direction,
+                gaze_data.combined_eye_gaze_data.gaze_direction,
+                time_delta=gaze_data.timestamp - self.last_gaze_data.timestamp)
+            # print(speed)
+            if speed <= self.angular_threshold_degree:
+                gaze_data.gaze_type = GazeType.FIXATION
+            else:
+                gaze_data.gaze_type = GazeType.SACCADE
+        else:
+            print('invalid gaze data')
+        self.last_gaze_data = gaze_data
+
+        return gaze_data
+

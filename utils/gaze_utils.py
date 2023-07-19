@@ -42,7 +42,7 @@ class EyeData:
 
 class GazeData:
 
-    def __init__(self, left_eye_gaze_data: EyeData, right_eye_gaze_data: EyeData):
+    def __init__(self, left_eye_gaze_data: EyeData = EyeData(), right_eye_gaze_data: EyeData = EyeData()):
         self.left_eye_gaze_data = left_eye_gaze_data
         self.right_eye_gaze_data = right_eye_gaze_data
         self.combined_eye_gaze_data = self.get_combined_eye_gaze_data()
