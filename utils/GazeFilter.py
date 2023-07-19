@@ -125,11 +125,10 @@ class GazeFilterFixationDetectionIDTAngular(DataProcessor):
 
 
 class GazeFilterFixationDetectionIVT(DataProcessor):
-    def __init__(self, angular_threshold_degree=100):
+    def __init__(self, angular_speed_threshold_degree=100):
         super().__init__()
         self.last_gaze_data = GazeData()
-        self.angular_threshold_degree = angular_threshold_degree
-
+        self.angular_threshold_degree = angular_speed_threshold_degree
 
     def process_sample(self, gaze_data: GazeData):
         if self.last_gaze_data.combined_eye_gaze_data.gaze_point_valid:
@@ -148,4 +147,3 @@ class GazeFilterFixationDetectionIVT(DataProcessor):
         self.last_gaze_data = gaze_data
 
         return gaze_data
-

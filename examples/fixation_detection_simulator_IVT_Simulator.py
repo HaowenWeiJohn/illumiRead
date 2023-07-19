@@ -49,7 +49,7 @@ angular_velocity_limit_degree = 1000  # degree per second
 
 buffer_duration = 150  # millisecond
 
-ivt_filter = GazeFilterFixationDetectionIVT()
+ivt_filter = GazeFilterFixationDetectionIVT(angular_speed_threshold_degree=100)
 ivt_filter.evoke_data_processor()
 gaze_data_classified = []
 
