@@ -30,7 +30,7 @@ right_eye_pupil_diameter_valid = gaze_data[TobiiProFusionChannel.RightPupilDiame
 left_eye_on_display_area_x = gaze_data[TobiiProFusionChannel.LeftGazePointOnDisplayAreaX]
 left_eye_on_display_area_y = gaze_data[TobiiProFusionChannel.LeftGazePointOnDisplayAreaY]
 
-plt.plot(left_eye_on_display_area_x[0:3000], left_eye_on_display_area_y[0:3000])
+plt.plot(left_eye_on_display_area_x[0:1500], left_eye_on_display_area_y[0:1500])
 plt.xlim(0, 1)
 plt.ylim(0, 1)
 plt.show()
@@ -144,6 +144,6 @@ for index, gaze_data in enumerate(gaze_data_classified):
         plt.scatter(gaze_data.combined_eye_gaze_data.gaze_point_on_display_area[0],
                     gaze_data.combined_eye_gaze_data.gaze_point_on_display_area[1], color=color)
 
-    if index == 3000:
+    if index == 1500:
         pass
 plt.show()
