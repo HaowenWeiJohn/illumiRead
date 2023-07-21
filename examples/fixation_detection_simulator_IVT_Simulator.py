@@ -145,5 +145,5 @@ for index, gaze_data in enumerate(gaze_data_classified):
                     gaze_data.combined_eye_gaze_data.gaze_point_on_display_area[1], color=color)
 
     if index == 1500:
-        pass
-plt.show()
+        plt.show()
+        break

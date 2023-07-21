@@ -3,6 +3,7 @@ from collections import deque
 from itertools import combinations
 
 
+
 # class DataProcessorDeque(deque):
 #     """A deque that can be used as a data processor"""
 #     def __init__(self, maxlen=None, channel_num=1, initial_value=0):
@@ -302,8 +303,6 @@ def edge_ignore_linear_interpolation(data, valid, invalid_flag=0, channel_number
 #     return dispersion
 
 
-import numpy as np
-from itertools import combinations
 
 
 def calculate_angular_dispersion(unit_vectors, in_degrees=True):
@@ -328,3 +327,13 @@ def calculate_angular_dispersion(unit_vectors, in_degrees=True):
     dispersion = np.degrees(dispersion) if in_degrees else dispersion
 
     return dispersion
+
+
+
+
+
+
+
+
+
+
