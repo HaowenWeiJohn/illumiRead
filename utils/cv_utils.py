@@ -3,8 +3,10 @@ import matplotlib.pyplot as plt
 import cv2
 import torch
 from PIL import Image, ImageDraw
+import torch.nn.functional as F
 
-def generate_binary_mask(image, depth_first=False):
+
+def generate_iamge_binary_mask(image, depth_first=False):
     if depth_first:
         image = np.moveaxis(image, 0, -1)
 
@@ -12,8 +14,6 @@ def generate_binary_mask(image, depth_first=False):
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     _, binary_mask = cv2.threshold(gray_image, 254, 1, cv2.THRESH_BINARY_INV)
     return binary_mask
-
-
 
 
 def draw_grids_on_image(image_path, image_save_path, n, m):
@@ -41,6 +41,15 @@ def draw_grids_on_image(image_path, image_save_path, n, m):
     # Save the modified image
     img.save(image_save_path)
 
-# # Replace "path_to_image.png" with the actual path of your PNG image
-# # Replace n and m with your desired grid size
-# draw_grids_on_image("OCT_Image.png", n=50, m=25)
+
+def generate_attention_grid_mask(image_mask, attention_patch_shape):
+    kernel = torch.tensor(np.ones(shape=(attention_patch_shape[0], attention_patch_shape[1])), dtype=torch.float32)
+    image_mask = torch.tensor(image_mask, dtype=torch.float32)
+
+    attention_grid_mask = F.conv2d(input=image_mask.view(1, 1, image_mask.shape[0], image_mask.shape[1]),
+                                   weight=kernel.view(1, 1, attention_patch_shape[0], attention_patch_shape[1]),
+                                   stride=(attention_patch_shape[0], attention_patch_shape[1]))
+
+    attention_grid_mask = attention_grid_mask.squeeze().cpu().numpy()
+    attention_grid_mask = np.where(attention_grid_mask > 0, 1, 0)
+    return attention_grid_mask
