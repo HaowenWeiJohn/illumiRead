@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from utils.cv_utils import generate_iamge_binary_mask, generate_attention_grid_mask
+from utils.cv_utils import generate_image_binary_mask, generate_attention_grid_mask
 
 image_height = 1000
 image_width = 2000
@@ -12,7 +12,7 @@ image = cv2.imread(image_path)
 image = cv2.resize(image, (image_width, image_height))
 
 
-binary_mask = generate_iamge_binary_mask(image)
+binary_mask = generate_image_binary_mask(image)
 
 attention_grid_mask = generate_attention_grid_mask(binary_mask, attention_patch_shape=attention_patch_size)
 

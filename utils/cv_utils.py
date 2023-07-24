@@ -6,16 +6,6 @@ from PIL import Image, ImageDraw
 import torch.nn.functional as F
 
 
-def generate_iamge_binary_mask(image, depth_first=False):
-    if depth_first:
-        image = np.moveaxis(image, 0, -1)
-
-    # Convert the RGB image to grayscale
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    _, binary_mask = cv2.threshold(gray_image, 254, 1, cv2.THRESH_BINARY_INV)
-    return binary_mask
-
-
 def draw_grids_on_image(image_path, image_save_path, n, m):
     # Load the image
     img = Image.open(image_path)
@@ -41,6 +31,14 @@ def draw_grids_on_image(image_path, image_save_path, n, m):
     # Save the modified image
     img.save(image_save_path)
 
+def generate_image_binary_mask(image, depth_first=False):
+    if depth_first:
+        image = np.moveaxis(image, 0, -1)
+
+    # Convert the RGB image to grayscale
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, binary_mask = cv2.threshold(gray_image, 254, 1, cv2.THRESH_BINARY_INV)
+    return binary_mask
 
 def generate_attention_grid_mask(image_mask, attention_patch_shape):
     kernel = torch.tensor(np.ones(shape=(attention_patch_shape[0], attention_patch_shape[1])), dtype=torch.float32)
