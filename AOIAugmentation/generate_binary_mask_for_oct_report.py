@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from utils.cv_utils import generate_image_binary_mask, generate_attention_grid_mask
+import matplotlib.pyplot as plt
 
 image_height = 1000
 image_width = 2000
@@ -16,4 +17,6 @@ binary_mask = generate_image_binary_mask(image)
 
 attention_grid_mask = generate_attention_grid_mask(binary_mask, attention_patch_shape=attention_patch_size)
 
+plt.imshow(attention_grid_mask)
+plt.show()
 
