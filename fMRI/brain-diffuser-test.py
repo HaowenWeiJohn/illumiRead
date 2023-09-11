@@ -1,3 +1,5 @@
+# this script is used to generate the test images for the brain-diffuser
+
 import numpy as np
 import cv2
 import os
